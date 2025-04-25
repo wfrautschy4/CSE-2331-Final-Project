@@ -42,7 +42,6 @@ class RedBlackTree<T> {
         //Shift Child Node from right node to left one
         leftroot.replaceRight(right.left());
         
-        
         //Assemble Right with leftroot as left child
         right.replaceLeft(leftroot);
         
@@ -76,12 +75,41 @@ class RedBlackTree<T> {
         //Shift Child Node from left node to right one
         rightroot.replaceLeft(left.right());
         
-        
         //Assemble left with rightroot as right child
         left.replaceRight(rightroot);
         
         //Transfer data to root
         root.transferFrom(left);
+    }
+
+    private static <T> T removeMin(BinaryTree<T> t){
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
+        T root = t.disassemble(left, right);
+        T min = root; 
+
+        if(left != null){
+            min = removeMin(left);
+
+            //Only Reassemble if its not a leaf node to remove it
+            t.assemble(root, left, right);
+        } 
+        return min;
+    }
+
+    private static <T> T removeMax(BinaryTree<T> t){
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
+        T root = t.disassemble(left, right);
+        T max = root; 
+
+        if(right != null){
+            max = removeMax(right);
+
+            //Only Reassemble if its not a leaf node to remove it
+            t.assemble(root, left, right);
+        } 
+        return max;
     }
 
     /**
@@ -114,6 +142,9 @@ class RedBlackTree<T> {
         return false;
     }
 
+    public static <T> void balanceTree(BinaryTree<T> root){
+        //Recursively Call and check heights of children until height difference is two
+    }
 
 
     // ------------ Non-Static Functions ------------ //

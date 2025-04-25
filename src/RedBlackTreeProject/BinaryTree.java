@@ -53,6 +53,42 @@ class BinaryTree<T> {
         return temp;
     }
 
+    public BinaryTree<T> replaceRight(BinaryTree<T> right){
+        BinaryTree<T> temp = new BinaryTree<T>();
+        if(this.right != null){
+            temp.transferFrom(this.right);
+        } else {
+            temp = null;
+        }
+
+        if(right != null){
+            this.right = new BinaryTree<T>();
+            this.right.transferFrom(right);
+        } else {
+            this.right = null;
+        }
+
+        return temp;
+    }
+    
+    public BinaryTree<T> replaceLeft(BinaryTree<T> left){
+        BinaryTree<T> temp = new BinaryTree<T>();
+        if(this.left != null){
+            temp.transferFrom(this.left);
+        } else {
+            temp = null;
+        }
+
+        if(left != null){
+            this.left = new BinaryTree<T>();
+            this.left.transferFrom(left);
+        } else {
+            this.left = null;
+        }
+        
+        return temp;
+    }
+
     /**
      * Assembles the tree with the given data. Replaces any old values
      * 
@@ -140,42 +176,6 @@ class BinaryTree<T> {
         this.right = source.right;
         this.data = source.data;
         source.clear();
-    }
-
-    public BinaryTree<T> replaceRight(BinaryTree<T> right){
-        BinaryTree<T> temp = new BinaryTree<T>();
-        if(this.right != null){
-            temp.transferFrom(this.right);
-        } else {
-            temp = null;
-        }
-
-        if(right != null){
-            this.right = new BinaryTree<T>();
-            this.right.transferFrom(right);
-        } else {
-            this.right = null;
-        }
-
-        return temp;
-    }
-    
-    public BinaryTree<T> replaceLeft(BinaryTree<T> left){
-        BinaryTree<T> temp = new BinaryTree<T>();
-        if(this.left != null){
-            temp.transferFrom(this.left);
-        } else {
-            temp = null;
-        }
-
-        if(left != null){
-            this.left = new BinaryTree<T>();
-            this.left.transferFrom(left);
-        } else {
-            this.left = null;
-        }
-        
-        return temp;
     }
 
     /**

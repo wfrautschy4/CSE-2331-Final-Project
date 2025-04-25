@@ -29,40 +29,18 @@ class test {
         TreePrinter.printTree(bt);
 
         System.out.println("Rotating Right");
-        RedBlackTree.rotateRight(bt);
-        TreePrinter.printTree(bt);
-        System.out.println("Height: "+ bt.height());
-        System.out.println("Size: "+ bt.size());
-
-        System.out.println("Rotating Right");
-        RedBlackTree.rotateRight(bt);
+        RedBlackTree.rotateRight(bt.left());
         TreePrinter.printTree(bt);
         System.out.println("Height: "+ bt.height());
         System.out.println("Size: "+ bt.size());
 
         System.out.println("Rotating Left");
-        RedBlackTree.rotateLeft(bt);
+        RedBlackTree.rotateLeft(bt.left());
         TreePrinter.printTree(bt);
         System.out.println("Height: "+ bt.height());
         System.out.println("Size: "+ bt.size());
 
-        System.out.println("Rotating Left");
-        RedBlackTree.rotateLeft(bt);
-        TreePrinter.printTree(bt);
-        System.out.println("Height: "+ bt.height());
-        System.out.println("Size: "+ bt.size());
-
-        System.out.println("Rotating Left");
-        RedBlackTree.rotateLeft(bt);
-        TreePrinter.printTree(bt);
-        System.out.println("Height: "+ bt.height());
-        System.out.println("Size: "+ bt.size());
-
-        System.out.println("Rotating Left");
-        RedBlackTree.rotateLeft(bt);
-        TreePrinter.printTree(bt);
-        System.out.println("Height: "+ bt.height());
-        System.out.println("Size: "+ bt.size());
+        
         
     }
 }
