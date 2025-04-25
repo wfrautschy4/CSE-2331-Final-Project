@@ -1,8 +1,6 @@
-import BinaryTree.java;
+package RedBlackTreeProject;
 
 class RedBlackTree<T> {
-
-    
 
 
     // ------------ Setup Functions ------------ //   
@@ -17,8 +15,6 @@ class RedBlackTree<T> {
         this.t = new BinaryTree<T>();
     }
 
-
-
     // ---------------- Static Functions ------------ //
 
     /**
@@ -32,8 +28,26 @@ class RedBlackTree<T> {
      *           root = #root.right && 
      *           root.left.right = #root.right.left }
      */
-    private static void rotateLeft(BinaryTree root){
+    public static <T> void rotateLeft(BinaryTree<T> root){
+        if(root.height() == 0 || root.right == null) System.out.println("ERROR: Invalid tree rotating left");
 
+        //Initialize Temporary Objects to store and manipulate
+        BinaryTree<T> leftroot = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
+
+        //Separate the right child from tree
+        right.transferFrom(root.right());
+        leftroot.transferFrom(root);
+
+        //Shift Child Node from right node to left one
+        leftroot.replaceRight(right.left());
+        
+        
+        //Assemble Right with leftroot as left child
+        right.replaceLeft(leftroot);
+        
+        //Transfer data to root
+        root.transferFrom(right);
     }
 
 
@@ -48,8 +62,26 @@ class RedBlackTree<T> {
      *           root = #root.left && 
      *           root.left.right = #root.right.left }
      */
-    private static void rotateRight(BinaryTree root){
+    public static <T> void rotateRight(BinaryTree<T> root){
+        if(root.height() == 0 || root.left == null) System.out.println("ERROR: Invalid tree rotating right");
+
+        //Initialize Temporary Objects to store and manipulate
+        BinaryTree<T> rightroot = new BinaryTree<T>();
+        BinaryTree<T> left = new BinaryTree<T>();
+
+        //Separate the left child from tree
+        left.transferFrom(root.left());
+        rightroot.transferFrom(root);
+
+        //Shift Child Node from left node to right one
+        rightroot.replaceLeft(left.right());
         
+        
+        //Assemble left with rightroot as right child
+        left.replaceRight(rightroot);
+        
+        //Transfer data to root
+        root.transferFrom(left);
     }
 
     /**
@@ -58,7 +90,7 @@ class RedBlackTree<T> {
      * @param root
      *      Root of the given BinaryTree
      */
-    static void reinstateColors(BinaryTree root){
+    public static <T> void reinstateColors(BinaryTree<T> root){
 
     }
 
@@ -76,23 +108,25 @@ class RedBlackTree<T> {
      *      The root of the BinaryTree
      * @return {Yes if the given BinaryTree is a valid red/black tree}
      */
-    static boolean checkValidity(BinaryTree root){
+    public static <T> boolean checkValidity(BinaryTree<T> root){
 
+
+        return false;
     }
 
 
 
     // ------------ Non-Static Functions ------------ //
 
-    public void insert(Object data){
+    public void insert(T data){
 
     }
 
-    public void delete(Object data){
+    public void delete(T data){
 
     }
 
-    public void search(Object data){
+    public void search(T data){
 
     }
 
