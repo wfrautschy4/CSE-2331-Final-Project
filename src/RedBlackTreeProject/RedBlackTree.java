@@ -196,7 +196,7 @@ class RedBlackTree<T extends Comparable<T>> {
         BinaryTree<T> right = new BinaryTree<T>();
 
         //Not leaf node
-        if (t.size() != 0) {
+        if (!(t.size() == 0)) {
             T root = t.disassemble(left, right);
 
             //Follow sorted path down tree until node doesn't exist
@@ -209,9 +209,70 @@ class RedBlackTree<T extends Comparable<T>> {
             t.assemble(root, left, right);
 
             //Ensure that tree is balanced after inserting
-            // balanceTree(t);
+            balanceTree(t);
         } else {
             t.assemble(x, left, right);
+        }
+
+
+
+    }
+
+    /**
+     * Deletes {@code x} in {@code t}.
+     *
+     * @param <T>
+     *            type of {@code BinaryTree} labels
+     * @param t
+     *            the {@code BinaryTree} to be searched
+     * @param x
+     *            the label to be inserted
+     * @aliases reference {@code x}
+     * @updates t
+     * @requires IS_BST(t) and x is not in labels(t)
+     * @ensures IS_BST(t) and labels(t) = labels(#t) union {x}
+     */
+    private static <T extends Comparable<T>> void deleteInTree(BinaryTree<T> t,
+            T x) {
+        assert t != null : "Violation of: t is not null";
+        assert x != null : "Violation of: x is not null";
+
+        if(t.size() == 0){
+            //The tree is empty, so there is nothing to delete
+            return;
+        }
+
+        //Init Vars
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
+        T root = t.disassemble(left, right);
+        int cmp = x.compareTo(root);
+
+        //Recursively check to find node
+        if(cmp > 0){
+            deleteInTree(right, x); 
+            t.assemble(root, left, right);
+        }else if(cmp < 0){
+            deleteInTree(left, x); 
+            t.assemble(root, left, right);
+        }else{
+            // Found the node to delete 
+            if (left.size() == 0) { 
+                //Case 1: Only right child or no children 
+                t.transferFrom(right); 
+            } else if (right.size() == 0) { 
+                //Case 2: Only left child 
+                t.transferFrom(left); 
+            } else { 
+                //Case 3: Two children: Find successor
+                T min = removeMin(right); 
+                t.assemble(min, left, right);
+            }
+        }
+
+        // After deletion, rebalance 
+        if (t.size() > 1) { 
+            balanceTree(t); 
         }
 
 
@@ -239,7 +300,7 @@ class RedBlackTree<T extends Comparable<T>> {
     }
 
     public void delete(T data){
-
+        
     }
 
     public void search(T data){
