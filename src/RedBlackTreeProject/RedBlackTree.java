@@ -196,7 +196,7 @@ class RedBlackTree<T extends Comparable<T>> {
         BinaryTree<T> right = new BinaryTree<T>();
 
         //Not leaf node
-        if (!(t.size() == 0)) {
+        if (t.size() != 0) {
             T root = t.disassemble(left, right);
 
             //Follow sorted path down tree until node doesn't exist
@@ -209,7 +209,7 @@ class RedBlackTree<T extends Comparable<T>> {
             t.assemble(root, left, right);
 
             //Ensure that tree is balanced after inserting
-            balanceTree(t);
+            // balanceTree(t);
         } else {
             t.assemble(x, left, right);
         }

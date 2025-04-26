@@ -11,10 +11,7 @@ class BinaryTree<T> {
      * Constructor for if it is a blank Tree
      */
     public BinaryTree(){
-        this.left = null;
-        this.right = null;
-        this.data = null;
-        this.color = true; //Red by default
+        this.createNewRep();
     }
 
 
@@ -25,10 +22,8 @@ class BinaryTree<T> {
      *      Data to add to the root Node
      */
     public BinaryTree(T data){
-        this.left = null;
-        this.right = null;
+        this.createNewRep();
         this.data = data;
-        this.color = true;
     }
 
     /**
@@ -54,37 +49,27 @@ class BinaryTree<T> {
     }
 
     public BinaryTree<T> replaceRight(BinaryTree<T> right){
+
+        // Save Data currently in Right Tree
         BinaryTree<T> temp = new BinaryTree<T>();
-        if(this.right != null){
-            temp.transferFrom(this.right);
-        } else {
-            temp = null;
-        }
-
-        if(right != null){
-            this.right = new BinaryTree<T>();
-            this.right.transferFrom(right);
-        } else {
-            this.right = null;
-        }
-
+        if(this.right != null) temp.transferFrom(this.right);
+        
+        //Transfer Data into Right Node if its not null
+        this.right = new BinaryTree<T>();
+        if(right != null) this.right.transferFrom(right);
+        
         return temp;
     }
     
     public BinaryTree<T> replaceLeft(BinaryTree<T> left){
-        BinaryTree<T> temp = new BinaryTree<T>();
-        if(this.left != null){
-            temp.transferFrom(this.left);
-        } else {
-            temp = null;
-        }
 
-        if(left != null){
-            this.left = new BinaryTree<T>();
-            this.left.transferFrom(left);
-        } else {
-            this.left = null;
-        }
+        // Save Data in Left Tree
+        BinaryTree<T> temp = new BinaryTree<T>();
+        if(this.left != null) temp.transferFrom(this.left);
+
+        //Transfer Data into Left Node if its not null
+        this.left = new BinaryTree<T>();
+        if(left != null) this.left.transferFrom(left);
         
         return temp;
     }
@@ -100,10 +85,14 @@ class BinaryTree<T> {
      *      BinaryTree to add to the right child
      */
     public void assemble(T root, BinaryTree<T> left, BinaryTree<T> right){
-        if(left != null) this.left.transferFrom(left);
-        else this.left = null;
-        if(right != null) this.right.transferFrom(right);
-        else this.right = null;
+        // Initialize if null
+        if (this.left == null) this.left = new BinaryTree<T>();
+        if (this.right == null) this.left = new BinaryTree<T>();
+
+        //Transfer Data if it is real
+        if (left != null) this.left.transferFrom(left);
+        if (right != null) this.right.transferFrom(right);
+
         this.data = root;
     }
 
@@ -117,11 +106,15 @@ class BinaryTree<T> {
      * @return
      */
     public T disassemble(BinaryTree<T> left, BinaryTree<T> right){
-        if(this.left != null) left.transferFrom(this.left);
-        else left = null;
-        if(this.right != null) right.transferFrom(this.right);
-        else right = null;
+        //Initialize Children if not done
+        if(this.left == null) this.left = new BinaryTree<T>();
+        if(this.right == null) this.right = new BinaryTree<T>();
  
+        //Transfer Children to Parameters
+        left.transferFrom(this.left);
+        right.transferFrom(this.right);
+
+        //Alter Node Data
         T data = this.data;
         this.data = null;
 
@@ -180,14 +173,17 @@ class BinaryTree<T> {
         source.clear();
     }
 
-    /**
-     * Clears all local variables to the BinaryTree
-     */
-    public void clear(){
+    private void createNewRep(){
         this.left = null;
         this.right = null;
         this.data = null;
         this.color = true;
+    }
+    /**
+     * Clears all local variables to the BinaryTree
+     */
+    public void clear(){
+        this.createNewRep();
     }
 
     public BinaryTree<T> left(){
