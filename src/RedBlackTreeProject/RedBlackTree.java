@@ -1,20 +1,6 @@
 package RedBlackTreeProject;
 
-class RedBlackTree<T> {
-
-
-    // ------------ Setup Functions ------------ //   
-
-    private BinaryTree<T> t;
-    
-    /**
-     *  Constructor for the class.
-     */
-    public RedBlackTree() {
-        //Initialize a Blank Tree
-        this.t = new BinaryTree<T>();
-    }
-
+class RedBlackTree<T extends Comparable<T>> {
     // ---------------- Static Functions ------------ //
 
     /**
@@ -97,19 +83,60 @@ class RedBlackTree<T> {
         return min;
     }
 
-    private static <T> T removeMax(BinaryTree<T> t){
-        BinaryTree<T> left = new BinaryTree<T>();
-        BinaryTree<T> right = new BinaryTree<T>();
-        T root = t.disassemble(left, right);
-        T max = root; 
+    private static <T> int getBalancedFactor(BinaryTree<T> root){
+        int leftHeight = root.left() == null ? -1 : root.left().height();
+        int rightHeight = root.right() == null ? -1 : root.right().height();
+        return rightHeight - leftHeight;
+    }
 
-        if(right != null){
-            max = removeMax(right);
+    /*
+    * Step 1: Recursively Climb down Tree
+    * Step 2: Check Differences in Children's Heights
+    *      abs(left.height() - right.height()) >= 2 is evident of a rotation
+    * Step 3: Find Path of Steepest Descent
+    * Step 4: Do according rotations
+    * Step 5: Call balanceTree on children only if their height difference is > 1
+    */
+    public static <T> void balanceTree(BinaryTree<T> root){
+       
+        //Check if it is a leaf node
+        if(root.height() != 0){
+            BinaryTree<T> left = new BinaryTree<T>(); //Make variables for easier addressing
+            BinaryTree<T> right = new BinaryTree<T>();
+            left = root.left();
+            right = root.right();
 
-            //Only Reassemble if its not a leaf node to remove it
-            t.assemble(root, left, right);
-        } 
-        return max;
+            //Recursively Climb Down Tree
+            if(left != null) balanceTree(left);
+            if(right != null) balanceTree(right);
+
+            //Check differences in Children's Heights
+            int balancedFactor = getBalancedFactor(root);
+            if(Math.abs(balancedFactor) < 2) return; // Tree is balanced
+
+            // Find Path of Steepest Descent (left.height != right.height)
+            // Call Appropriate Rotations to Balance based on Path
+            if(balancedFactor < 0){ //Left Heavy
+                int leftBalancedFactor = getBalancedFactor(left);
+                if (leftBalancedFactor <= 0){
+                    rotateRight(root);  // (LL)
+                } else {
+                    rotateLeft(left);   // (LR)
+                    rotateRight(root);
+                }
+            } else {
+                int rightBalancedFactor = getBalancedFactor(right);
+                if(rightBalancedFactor >= 0){
+                    rotateLeft(root);   // (RR)
+                } else {
+                    rotateRight(right); // (RL)
+                    rotateLeft(root);
+                    
+                }
+            }       
+            if(root.left() != null && getBalancedFactor(root.left()) >= 2) balanceTree(root.left());
+            if(root.right() != null && getBalancedFactor(root.right()) >= 2) balanceTree(root.right());
+        }
     }
 
     /**
@@ -142,86 +169,73 @@ class RedBlackTree<T> {
         return false;
     }
 
-    private static <T> int getBalancedFactor(BinaryTree<T> root){
-        int leftHeight = root.left() == null ? -1 : root.left().height();
-        int rightHeight = root.right() == null ? -1 : root.right().height();
-        return rightHeight - leftHeight;
-    }
+     /**
+     * Inserts {@code x} in {@code t}.
+     *
+     * @param <T>
+     *            type of {@code BinaryTree} labels
+     * @param t
+     *            the {@code BinaryTree} to be searched
+     * @param x
+     *            the label to be inserted
+     * @aliases reference {@code x}
+     * @updates t
+     * @requires IS_BST(t) and x is not in labels(t)
+     * @ensures IS_BST(t) and labels(t) = labels(#t) union {x}
+     */
+    private static <T extends Comparable<T>> void insertInTree(BinaryTree<T> t,
+            T x) {
+        assert t != null : "Violation of: t is not null";
+        assert x != null : "Violation of: x is not null";
+        if(t.root() == null){
+            t.replaceRoot(x);
+            return;
+        }
+        //Init Vars
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
 
-    public static <T> void balanceTree(BinaryTree<T> root){
-        /*
-         * Step 1: Recursively Climb down Tree
-         * Step 2: Check Differences in Children's Heights
-         *      abs(left.height() - right.height()) >= 2 is evident of a rotation
-         * Step 3: Find Path of Steepest Descent
-         * Step 4: Do according rotations
-         * Step 5: Call balanceTree on children only if their height difference is > 1
-         */
-        
-        //Check if it is a leaf node
-        if(root.height() != 0){
-            BinaryTree<T> left = new BinaryTree<T>(); //Make variables for easier addressing
-            BinaryTree<T> right = new BinaryTree<T>();
-            left = root.left();
-            right = root.right();
+        //Not leaf node
+        if (!(t.size() == 0)) {
+            T root = t.disassemble(left, right);
 
-            //Recursively Climb Down Tree
-            if(left != null) balanceTree(left);
-            if(right != null) balanceTree(right);
-
-            //Check differences in Children's Heights
-            int balancedFactor = getBalancedFactor(root);
-            if(Math.abs(balancedFactor) < 2) return; // Tree is balanced
-
-            // System.out.println("---------------------------------------");
-            // Find Path of Steepest Descent (left.height != right.height)
-            // Call Appropriate Rotations to Balance based on Path
-            if(balancedFactor < 0){ //Left Heavy
-                int leftBalancedFactor = getBalancedFactor(left);
-                if (leftBalancedFactor <= 0){
-                    // System.out.println("Right Rotation Performed on: "+ root.root());
-                    rotateRight(root);  // (LL)
-                } else {
-                    // System.out.println("Left-Right Rotation Performed on: "+ left.root()+ " and "+ root.root());
-                    rotateLeft(left);   // (LR)
-                    rotateRight(root);
-                }
-            } else {
-                int rightBalancedFactor = getBalancedFactor(right);
-                if(rightBalancedFactor >= 0){
-                    // System.out.println("Left Rotation Performed on: "+ root.root());
-                    rotateLeft(root);   // (RR)
-                } else {
-                    // System.out.println("Right-Left Rotation Performed on: "+ right.root()+ " and "+ root.root());
-                    rotateRight(right); // (RL)
-                    rotateLeft(root);
-                    
-                }
+            //Follow sorted path down tree until node doesn't exist
+            if (root.compareTo(x) > 0) {
+                insertInTree(left, x);
+            } else if (root.compareTo(x) < 0) {
+                insertInTree(right, x);
             }
 
-            // //Check if Children need to be Rebalanced
-            // System.out.println("Root BalancedFactor: "+getBalancedFactor(root));
-            // TreePrinter.printTree(root);
-            
-            // if(root.left() != null) {
-            //     System.out.println("Left BalancedFactor: "+getBalancedFactor(root.left()));
-            //     TreePrinter.printTree(root.left());
-            // }
-            // if(root.right() != null) {
-            //     System.out.println("Right BalancedFactor: "+getBalancedFactor(root.right()));
-            //     TreePrinter.printTree(root.right());
-            
-       
-            if(root.left() != null && getBalancedFactor(root.left()) >= 2) balanceTree(root.left());
-            if(root.right() != null && getBalancedFactor(root.right()) >= 2) balanceTree(root.right());
+            t.assemble(root, left, right);
+
+            //Ensure that tree is balanced after inserting
+            balanceTree(t);
+        } else {
+            t.assemble(x, left, right);
         }
+
+
+
     }
 
+
+     // ------------ Setup Functions ------------ //   
+
+     private BinaryTree<T> t;
+    
+     /**
+      *  Constructor for the class.
+      */
+     public RedBlackTree() {
+         //Initialize a Blank Tree
+         this.t = new BinaryTree<T>();
+     }
+ 
 
     // ------------ Non-Static Functions ------------ //
 
     public void insert(T data){
-
+        insertInTree(this.t, data);
     }
 
     public void delete(T data){
@@ -234,5 +248,9 @@ class RedBlackTree<T> {
 
     public void traverse(){
 
+    }
+
+    public BinaryTree<T> getTree(){
+        return this.t;
     }
 }

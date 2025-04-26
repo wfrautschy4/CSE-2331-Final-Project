@@ -45,31 +45,30 @@ class test {
     }
 
     public static void main(String args[]){
-        // BinaryTree<Integer> bt = new BinaryTree<Integer>();
-        // BinaryTree<Integer> left = new BinaryTree<Integer>(3);
-        // BinaryTree<Integer> right = new BinaryTree<Integer>(2);
+        RedBlackTree<Integer> rbt = new RedBlackTree<Integer>();
 
-        // BinaryTree<Integer> leftleft = new BinaryTree<Integer>(10);
-        // BinaryTree<Integer> leftright = new BinaryTree<Integer>(1);
+        //Insert n elements into the tree and print each step
+        int n = 5;
+        for(int i = 0; i < n; i++){
+            int randomNum = (int) Math.floor(Math.random() * 99 + 1);
+            rbt.insert(randomNum);
 
-        // BinaryTree<Integer> rightleft = new BinaryTree<Integer>(7);
-        // BinaryTree<Integer> rightright = new BinaryTree<Integer>(12);
+            //Print it
+            TreePrinter.printTree(rbt.getTree());
+            System.out.println("----------------------------------");
+        }
 
-        // left.assemble(3, leftleft, leftright);
-        // right.assemble(2, rightleft, rightright);
-        // bt.assemble(5, left, right);
-
-        BinaryTree<Integer> bt = generateRandomTree(15);
+        // BinaryTree<Integer> bt = generateRandomTree(15);
         
-        TreePrinter.printTree(bt);
-        System.out.println("Height: "+ bt.height());
-        System.out.println("Size: "+ bt.size());
+        // TreePrinter.printTree(bt);
+        // System.out.println("Height: "+ bt.height());
+        // System.out.println("Size: "+ bt.size());
 
-        System.out.println("Rebalancing");
-        RedBlackTree.balanceTree(bt);
-        TreePrinter.printTree(bt);
-        System.out.println("Height: "+ bt.height());
-        System.out.println("Size: "+ bt.size());
+        // System.out.println("Rebalancing");
+        // RedBlackTree.balanceTree(bt);
+        // TreePrinter.printTree(bt);
+        // System.out.println("Height: "+ bt.height());
+        // System.out.println("Size: "+ bt.size());
 
         // System.out.println("Rotating Right");
         // RedBlackTree.rotateRight(bt);

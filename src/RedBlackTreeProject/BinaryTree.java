@@ -100,8 +100,10 @@ class BinaryTree<T> {
      *      BinaryTree to add to the right child
      */
     public void assemble(T root, BinaryTree<T> left, BinaryTree<T> right){
-        this.left.transferFrom(left);
-        this.right.transferFrom(right);
+        if(left != null) this.left.transferFrom(left);
+        else this.left = null;
+        if(right != null) this.right.transferFrom(right);
+        else this.right = null;
         this.data = root;
     }
 
@@ -115,8 +117,10 @@ class BinaryTree<T> {
      * @return
      */
     public T disassemble(BinaryTree<T> left, BinaryTree<T> right){
-        left.transferFrom(this.left);
-        right.transferFrom(this.right);
+        if(this.left != null) left.transferFrom(this.left);
+        else left = null;
+        if(this.right != null) right.transferFrom(this.right);
+        else right = null;
  
         T data = this.data;
         this.data = null;
