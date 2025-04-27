@@ -8,6 +8,14 @@ class BinaryTree<T> {
     T data;
     boolean color;  //Black = 0, Red = 1
 
+    private void createNewRep(){
+        this.left = null;
+        this.right = null;
+        this.data = null;
+        this.parent = null;
+        this.color = true;
+    }
+
     /**
      * Constructor for if it is a blank Tree
      */
@@ -91,9 +99,11 @@ class BinaryTree<T> {
         //Transfer Data if it is real
         if (left != null) {
             this.left.transferFrom(left);
+            this.left.parent = this;
         }
         if (right != null) {
             this.right.transferFrom(right);
+            this.right.parent = this;
         }
 
         //Remove Branches whose roots are null
@@ -182,12 +192,7 @@ class BinaryTree<T> {
         source.clear();
     }
 
-    private void createNewRep(){
-        this.left = null;
-        this.right = null;
-        this.data = null;
-        this.color = true;
-    }
+   
     /**
      * Clears all local variables to the BinaryTree
      */
@@ -204,8 +209,5 @@ class BinaryTree<T> {
     }
     public void setColor(boolean color){
         this.color = color;
-    }
-    private void setParent(BinaryTree<T> parent){
-        this.parent = parent;
     }
 }
