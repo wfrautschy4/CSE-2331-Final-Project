@@ -217,4 +217,27 @@ class BinaryTree<T> {
     public void setColor(boolean color){
         this.color = color;
     }
+
+    public void verifyParentPointers() {
+        verifyParentPointers(this, null);
+    }
+    
+    private void verifyParentPointers(BinaryTree<T> node, BinaryTree<T> expectedParent) {
+        if (node == null) return;
+    
+        if (node.parent != expectedParent) {
+            System.out.println("Parent pointer mismatch at node with data: " + node.data);
+        } else {
+            if(node.parent != null) System.out.println("Parent: "+node.parent.root() +" // Child: "+node.root());
+            else System.out.println("Parent: "+node.parent+" // Child: "+node.root());
+        }
+        
+    
+        if (node.left != null) {
+            verifyParentPointers(node.left, node);
+        }
+        if (node.right != null) {
+            verifyParentPointers(node.right, node);
+        }
+    }
 }
