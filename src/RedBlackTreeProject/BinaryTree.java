@@ -190,6 +190,12 @@ class BinaryTree<T> {
         this.right = source.right;
         this.data = source.data;
         this.color = source.color;
+        this.parent = null;
+
+        //Reassign children of sources parent to this
+        if(this.left != null) this.left.parent = this;
+        if(this.right != null) this.right.parent = this;
+
         source.clear();
     }
 
