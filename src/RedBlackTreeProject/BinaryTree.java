@@ -4,6 +4,7 @@ class BinaryTree<T> {
 
     BinaryTree<T> left;
     BinaryTree<T> right;
+    BinaryTree<T> parent;
     T data;
     boolean color;  //Black = 0, Red = 1
 
@@ -48,30 +49,28 @@ class BinaryTree<T> {
         return temp;
     }
 
-    public BinaryTree<T> replaceRight(BinaryTree<T> right){
+    public BinaryTree<T> replaceRight(BinaryTree<T> new_right){
 
-        // Save Data currently in Right Tree
-        BinaryTree<T> temp = new BinaryTree<T>();
-        if(this.right != null) temp.transferFrom(this.right);
-        
-        //Transfer Data into Right Node if its not null
-        this.right = new BinaryTree<T>();
-        if(right != null) this.right.transferFrom(right);
-        
-        return temp;
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
+
+        //Disassemble old tree and put new_right in its place
+        T root = this.disassemble(left, right);
+        this.assemble(root, left, new_right);
+                
+        return right;
     }
     
-    public BinaryTree<T> replaceLeft(BinaryTree<T> left){
+    public BinaryTree<T> replaceLeft(BinaryTree<T> new_left){
 
-        // Save Data in Left Tree
-        BinaryTree<T> temp = new BinaryTree<T>();
-        if(this.left != null) temp.transferFrom(this.left);
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
 
-        //Transfer Data into Left Node if its not null
-        this.left = new BinaryTree<T>();
-        if(left != null) this.left.transferFrom(left);
-        
-        return temp;
+        //Disassemble old tree and put new_right in its place
+        T root = this.disassemble(left, right);
+        this.assemble(root, new_left, right);
+                
+        return left;
     }
 
     /**
@@ -85,13 +84,21 @@ class BinaryTree<T> {
      *      BinaryTree to add to the right child
      */
     public void assemble(T root, BinaryTree<T> left, BinaryTree<T> right){
-        // Initialize if null
+        // Initialize if null and going to be changed
         if (this.left == null) this.left = new BinaryTree<T>();
-        if (this.right == null) this.left = new BinaryTree<T>();
+        if (this.right == null) this.right = new BinaryTree<T>();
 
         //Transfer Data if it is real
-        if (left != null) this.left.transferFrom(left);
-        if (right != null) this.right.transferFrom(right);
+        if (left != null) {
+            this.left.transferFrom(left);
+        }
+        if (right != null) {
+            this.right.transferFrom(right);
+        }
+
+        //Remove Branches whose roots are null
+        if (this.left.root() == null) this.left = null;
+        if (this.right.root() == null) this.right = null;
 
         this.data = root;
     }
@@ -114,8 +121,10 @@ class BinaryTree<T> {
         left.transferFrom(this.left);
         right.transferFrom(this.right);
 
-        //Alter Node Data
+        //Turn Children null
         T data = this.data;
+        this.left = null;
+        this.right = null;
         this.data = null;
 
         return data;
@@ -148,7 +157,7 @@ class BinaryTree<T> {
      * @return size(tree)
      */
     public int size(){
-        int size = 1;
+        int size = this.data != null ? 1 : 0;
 
         if(this.left != null){
             size += this.left.size();
@@ -192,5 +201,11 @@ class BinaryTree<T> {
 
     public BinaryTree<T> right(){
         return this.right;
+    }
+    public void setColor(boolean color){
+        this.color = color;
+    }
+    private void setParent(BinaryTree<T> parent){
+        this.parent = parent;
     }
 }

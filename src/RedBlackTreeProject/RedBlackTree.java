@@ -68,19 +68,83 @@ class RedBlackTree<T extends Comparable<T>> {
         root.transferFrom(left);
     }
 
-    private static <T> T removeMin(BinaryTree<T> t){
+    /**
+     * Returns whether {@code x} is in {@code t}.
+     *
+     * @param <T>
+     *            type of {@code BinaryTree} labels
+     * @param t
+     *            the {@code BinaryTree} to be searched
+     * @param x
+     *            the label to be searched for
+     * @return true if t contains x, false otherwise
+     * @requires IS_BST(t)
+     * @ensures isInTree = (x is in labels(t))
+     */
+    private static <T extends Comparable<T>> boolean isInTree(BinaryTree<T> t,
+            T x) {
+        assert t != null : "Violation of: t is not null";
+        assert x != null : "Violation of: x is not null";
+
+        //Init Vars
         BinaryTree<T> left = new BinaryTree<T>();
         BinaryTree<T> right = new BinaryTree<T>();
-        T root = t.disassemble(left, right);
-        T min = root; 
+        boolean inTree = false;
 
-        if(left != null){
-            min = removeMin(left);
+        //Recursively Look for X
+        if (t.height() > 0) {
+            T root = t.disassemble(left, right);
 
-            //Only Reassemble if its not a leaf node to remove it
+            //Find which child to travel down
+            if (root.compareTo(x) > 0) {
+                inTree = isInTree(left, x);
+            } else if (root.compareTo(x) < 0) {
+                inTree = isInTree(right, x);
+            } else {
+                inTree = true;
+            }
+
+            //Reassemble Tree
             t.assemble(root, left, right);
-        } 
-        return min;
+        }
+        return inTree;
+    }
+    /**
+     * Removes and returns the smallest (left-most) label in {@code t}.
+     *
+     * @param <T>
+     *            type of {@code BinaryTree} labels
+     * @param t
+     *            the {@code BinaryTree} from which to remove the label
+     * @return the smallest label in the given {@code BinaryTree}
+     * @updates t
+     * @requires IS_BST(t) and |t| > 0
+     * @ensures <pre>
+     * IS_BST(t)  and  removeSmallest = [the smallest label in #t]  and
+     *  labels(t) = labels(#t) \ {removeSmallest}
+     * </pre>
+     */
+    public static <T> T removeMin(BinaryTree<T> t) {
+        assert t != null : "Violation of: t is not null";
+        assert t.size() > 0 : "Violation of: |t| > 0";
+
+        //Init Vars
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
+
+        T root = t.disassemble(left, right);
+        T smallest = root;
+
+        if (left.size() > 0) {
+            //Follow left node
+            smallest = removeMin(left);
+
+            t.assemble(root, left, right);
+        } else {
+            t.transferFrom(right);
+        }
+
+        return smallest;
     }
 
     private static <T> int getBalancedFactor(BinaryTree<T> root){
@@ -97,8 +161,7 @@ class RedBlackTree<T extends Comparable<T>> {
     * Step 4: Do according rotations
     * Step 5: Call balanceTree on children only if their height difference is > 1
     */
-    public static <T> void balanceTree(BinaryTree<T> root){
-       
+    public static <T> void balanceNode(BinaryTree<T> root){
         //Check if it is a leaf node
         if(root.height() != 0){
             BinaryTree<T> left = new BinaryTree<T>(); //Make variables for easier addressing
@@ -107,8 +170,8 @@ class RedBlackTree<T extends Comparable<T>> {
             right = root.right();
 
             //Recursively Climb Down Tree
-            if(left != null) balanceTree(left);
-            if(right != null) balanceTree(right);
+            // if(left != null) balanceTree(left);
+            // if(right != null) balanceTree(right);
 
             //Check differences in Children's Heights
             int balancedFactor = getBalancedFactor(root);
@@ -134,8 +197,8 @@ class RedBlackTree<T extends Comparable<T>> {
                     
                 }
             }       
-            if(root.left() != null && getBalancedFactor(root.left()) >= 2) balanceTree(root.left());
-            if(root.right() != null && getBalancedFactor(root.right()) >= 2) balanceTree(root.right());
+            if(root.left() != null && getBalancedFactor(root.left()) >= 2) balanceNode(root.left());
+            if(root.right() != null && getBalancedFactor(root.right()) >= 2) balanceNode(root.right());
         }
     }
 
@@ -196,11 +259,11 @@ class RedBlackTree<T extends Comparable<T>> {
         BinaryTree<T> right = new BinaryTree<T>();
 
         //Not leaf node
-        if (!(t.size() == 0)) {
+        if (t.size() != 0) {
             T root = t.disassemble(left, right);
 
             //Follow sorted path down tree until node doesn't exist
-            if (root.compareTo(x) > 0) {
+            if (root.compareTo(x) >= 0) {
                 insertInTree(left, x);
             } else if (root.compareTo(x) < 0) {
                 insertInTree(right, x);
@@ -209,76 +272,77 @@ class RedBlackTree<T extends Comparable<T>> {
             t.assemble(root, left, right);
 
             //Ensure that tree is balanced after inserting
-            balanceTree(t);
+            balanceNode(t);
         } else {
             t.assemble(x, left, right);
         }
-
-
-
     }
 
-    /**
-     * Deletes {@code x} in {@code t}.
+     /**
+     * Finds label {@code x} in {@code t}, removes it from {@code t}, and
+     * returns it.
      *
      * @param <T>
      *            type of {@code BinaryTree} labels
      * @param t
-     *            the {@code BinaryTree} to be searched
+     *            the {@code BinaryTree} from which to remove label {@code x}
      * @param x
-     *            the label to be inserted
-     * @aliases reference {@code x}
+     *            the label to be removed
+     * @return the removed label
      * @updates t
-     * @requires IS_BST(t) and x is not in labels(t)
-     * @ensures IS_BST(t) and labels(t) = labels(#t) union {x}
+     * @requires IS_BST(t) and x is in labels(t)
+     * @ensures <pre>
+     * IS_BST(t)  and  removeFromTree = x  and
+     *  labels(t) = labels(#t) \ {x}
+     * </pre>
      */
-    private static <T extends Comparable<T>> void deleteInTree(BinaryTree<T> t,
-            T x) {
+    public static <T extends Comparable<T>> T removeFromTree(BinaryTree<T> t, T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
-
-        if(t.size() == 0){
-            //The tree is empty, so there is nothing to delete
-            return;
-        }
+        assert t.size() > 0 : "Violation of: x is in labels(t)";
 
         //Init Vars
         BinaryTree<T> left = new BinaryTree<T>();
         BinaryTree<T> right = new BinaryTree<T>();
+        T item = t.root();
+
         T root = t.disassemble(left, right);
-        int cmp = x.compareTo(root);
-
-        //Recursively check to find node
-        if(cmp > 0){
-            deleteInTree(right, x); 
-            t.assemble(root, left, right);
-        }else if(cmp < 0){
-            deleteInTree(left, x); 
-            t.assemble(root, left, right);
-        }else{
-            // Found the node to delete 
-            if (left.size() == 0) { 
-                //Case 1: Only right child or no children 
-                t.transferFrom(right); 
-            } else if (right.size() == 0) { 
-                //Case 2: Only left child 
-                t.transferFrom(left); 
-            } else { 
-                //Case 3: Two children: Find successor
-                T min = removeMin(right); 
-                t.assemble(min, left, right);
+        if (!root.equals(x)) {
+            //Follow sorted path down tree until node doesn't exist
+            if (root.compareTo(x) > 0) {
+                item = removeFromTree(left, x);
+            } else if (root.compareTo(x) < 0) {
+                item = removeFromTree(right, x);
             }
+            t.assemble(root, left, right);
+            
+        } else {
+            //Root node is X
+            //Check condition of children
+            if (left.size() == 0 && right.size() > 0) {
+                t.transferFrom(right);
+            } else if (left.size() > 0 && right.size() == 0) {
+                t.transferFrom(left);
+            } else if (left.size() > 0 && right.size() > 0) {
+                t.assemble(removeMin(right), left, right);
+            }
+            balanceNode(t);
         }
 
-        // After deletion, rebalance 
-        if (t.size() > 1) { 
-            balanceTree(t); 
-        }
-
-
-
+        return item;
     }
 
+    static <T> void traverseInOrder(BinaryTree<T> t){
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
+
+        if (t.size() > 0){ //Not an empty node
+            T root = t.disassemble(left, right);
+            traverseInOrder(left);
+            System.out.print(root+" ");
+            traverseInOrder(right);
+        }
+    }
 
      // ------------ Setup Functions ------------ //   
 
@@ -292,26 +356,34 @@ class RedBlackTree<T extends Comparable<T>> {
          this.t = new BinaryTree<T>();
      }
  
-
     // ------------ Non-Static Functions ------------ //
 
     public void insert(T data){
         insertInTree(this.t, data);
     }
 
-    public void delete(T data){
-        
+    public T delete(T data){
+        return removeFromTree(this.t, data);
     }
 
-    public void search(T data){
-
+    public boolean contains(T data){
+        return isInTree(this.t, data);
     }
 
     public void traverse(){
-
+        //Print out data in sorted order
+        System.out.print("[ ");
+        traverseInOrder(this.t);
+        System.out.print("]\n");
     }
 
     public BinaryTree<T> getTree(){
         return this.t;
+    }
+    public int size(){
+        return this.t.size();
+    }
+    public int height(){
+        return this.t.height();
     }
 }
