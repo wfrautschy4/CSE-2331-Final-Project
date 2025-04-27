@@ -189,6 +189,7 @@ class BinaryTree<T> {
         this.left = source.left;
         this.right = source.right;
         this.data = source.data;
+        this.color = source.color;
         source.clear();
     }
 
