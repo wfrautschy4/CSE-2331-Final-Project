@@ -8,18 +8,16 @@ class test {
         RedBlackTree<Integer> rbt = new RedBlackTree<Integer>();
 
         //Insert n elements into the tree and print each step
-        int n = 25;
+        int n = 15;
         for(int i = 1; i <= n; i++){
             int randomNum = (int) Math.floor(Math.random() * 99 + 1);
             rbt.insert(randomNum);
 
             //Print it
-            // TreePrinter.printTree(rbt.getTree());
-            // System.out.println("----------------------------------");
+            rbt.getTree().verifyParentPointers();
+            TreePrinter.printTree(rbt.getTree());
+            System.out.println("----------------------------------");
         }
-        TreePrinter.printTree(rbt.getTree());
-        
-        rbt.traverse();
 
     }
 }
