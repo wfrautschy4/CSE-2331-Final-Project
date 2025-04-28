@@ -452,50 +452,51 @@ class RedBlackTree<T extends Comparable<T>> {
      *  labels(t) = labels(#t) \ {x}
      * </pre>
      */
-    public static <T extends Comparable<T>> void removeFromTree(BinaryTree<T> t, T x) {
-        BinaryTree<T> current = t;
-        
-        while (current != null && current.height() > 0) {
-            T rootData = current.data;
-            BinaryTree<T> left = current.left();
-            BinaryTree<T> right = current.right();
-            System.out.println("3");
-            if (rootData.equals(x)) {
-                System.out.println("4");
-                if ((left == null || left.height() == 0) && (right == null || right.height() == 0)) {
-                    System.out.println("Case 1");
-                    if (!current.color) deleteRedBlackValidity(current);
-                    current = null;
-                    return;
-                } else if (left == null || left.height() == 0) {
-                    if (right != null) right.parent = current.parent;
-                    current.transferFrom(right);
-                    return;
-                } else if (right == null || right.height() == 0) {
-                    if (left != null) left.parent = current.parent;
-                    current.transferFrom(left);
-                    return;
-                } else {
-                    // Find successor
-                    BinaryTree<T> successor = right;
-                    while (successor.left() != null && successor.left().height() > 0)
-                        successor = successor.left();
-                    
-                    boolean succWasBlack = !successor.color;
-                    current.data = successor.data;
+    private static <T extends Comparable<T>> T removeFromTree(BinaryTree<T> t, T x) {
+        assert t != null : "Violation of: t is not null";
+        assert x != null : "Violation of: x is not null";
+        assert t.size() > 0 : "Violation of: x is in labels(t)";
     
-                    removeFromTree(right, successor.data); // delete successor in right subtree
+        T item = t.data;
     
-                    if (succWasBlack) deleteRedBlackValidity(successor);
-                    return;
+        if (!t.data.equals(x)) {
+            // Follow sorted path down the tree
+            if (x.compareTo(t.data) < 0) {
+                item = removeFromTree(t.left, x);
+                // Clean up if child became empty after removal
+                if (t.left != null && t.left.data == null) {
+                    t.left = null;
                 }
-            } else if (x.compareTo(current.root()) < 0) {
-                current = current.left();
-            } else {
-                current = current.right();
+            } else if (x.compareTo(t.data) > 0) {
+                item = removeFromTree(t.right, x);
+                if (t.right != null && t.right.data == null) {
+                    t.right = null;
+                }
             }
-            
+        } else {
+            // Found node to delete
+            if (t.left == null && t.right != null) {
+                t.transferFrom(t.right);
+            } else if (t.left != null && t.right == null) {
+                t.transferFrom(t.left);
+            } else if (t.left != null && t.right != null) {
+                // Node has two children: replace with smallest from right subtree
+                BinaryTree<T> successor = t.right;
+                while (successor.left != null) {
+                    successor = successor.left;
+                }
+                t.data = successor.data;
+                removeFromTree(t.right, successor.data);
+                if (t.right != null && t.right.data == null) {
+                    t.right = null;
+                }
+            } else {
+                // Leaf node
+                t.clear();
+            }
         }
+    
+        return item;
     }
     
     
@@ -512,6 +513,7 @@ class RedBlackTree<T extends Comparable<T>> {
             traverseInOrder(left, list);
             list.add(root);
             traverseInOrder(right, list);
+            t.assemble(root, left, right);
         }
     }
 
