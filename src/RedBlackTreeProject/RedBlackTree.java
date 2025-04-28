@@ -1,5 +1,7 @@
 package RedBlackTreeProject;
 
+import java.util.ArrayList;
+
 class RedBlackTree<T extends Comparable<T>> {
     // ---------------- Static Functions ------------ //
 
@@ -500,15 +502,16 @@ class RedBlackTree<T extends Comparable<T>> {
         
     
 
-    static <T> void traverseInOrder(BinaryTree<T> t){
+
+    static <T> void traverseInOrder(BinaryTree<T> t, ArrayList<T> list){
         BinaryTree<T> left = new BinaryTree<T>();
         BinaryTree<T> right = new BinaryTree<T>();
 
         if (t.size() > 0){ //Not an empty node
             T root = t.disassemble(left, right);
-            traverseInOrder(left);
-            System.out.print(root+" ");
-            traverseInOrder(right);
+            traverseInOrder(left, list);
+            list.add(root);
+            traverseInOrder(right, list);
         }
     }
 
@@ -538,11 +541,12 @@ class RedBlackTree<T extends Comparable<T>> {
         return isInTree(this.t, data);
     }
 
-    public void traverse(){
+    public ArrayList<T> getList(){
         //Print out data in sorted order
-        System.out.print("[ ");
-        traverseInOrder(this.t);
-        System.out.print("]\n");
+        ArrayList<T> list = new ArrayList<T>();
+        traverseInOrder(this.t, list);
+        return list;
+
     }
 
     public BinaryTree<T> getTree(){
@@ -553,5 +557,8 @@ class RedBlackTree<T extends Comparable<T>> {
     }
     public int height(){
         return this.t.height();
+    }
+    public void clear(){
+        this.t.clear();
     }
 }
