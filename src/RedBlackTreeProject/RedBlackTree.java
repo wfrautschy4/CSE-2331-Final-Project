@@ -236,7 +236,7 @@ class RedBlackTree<T extends Comparable<T>> {
     }
 
     /**
-     * Checks the given tree to see if it is balanced and abides by the red/black rules.
+     * Checks the given tree to see if it is balanced and abides by the red/black rules when inserting.
      * 
      * . Every node is either red or black;
      * . The root is black;
@@ -273,28 +273,45 @@ class RedBlackTree<T extends Comparable<T>> {
         }else{
             System.out.println("Uncle doesn't exist or is black");
             if(parent.left == root && grandparent.left == parent){
-                rotateRight(grandparent);
                 parent.color = false;
                 grandparent.color = true; 
+                rotateRight(grandparent);        
             }else if(parent.right == root && grandparent.left == parent) {
-                rotateLeft(parent);
-                rotateRight(grandparent);
                 root.color = false;
                 grandparent.color = true; 
+                rotateLeft(parent);
+                rotateRight(grandparent);            
             }else if(parent.right == root && grandparent.right == parent){
-                rotateLeft(grandparent);
                 parent.color = false;
                 grandparent.color = true; 
+                rotateLeft(grandparent);
             }else if(parent.left == root && grandparent.right == parent){
+                root.color = false;
+                grandparent.color = true; 
                 rotateRight(parent);
                 rotateLeft(grandparent);
-                root.color = false;
-                grandparent.color = true; 
             }
 
                        
         }
         }
+    
+    /**
+     * Checks the given tree to see if it is balanced and abides by the red/black rules when inserting.
+     * 
+     * . Every node is either red or black;
+     * . The root is black;
+     * . Every leaf is NIL and is black;
+     * . If a node is red, then both its children are black;
+     * . All simple paths from the root to any leaf contain the same number of black nodes.
+     *   (Note: Every node in a binary tree is either a leaf or has BOTH a left AND right child.)
+     * 
+     * @param root
+     *      The root of the BinaryTree
+     * @return {Yes if the given BinaryTree is a valid red/black tree}
+     */
+    public static <T> void deleteRedBlackValidity(BinaryTree<T> root){
+    }
 
      /**
      * Inserts {@code x} in {@code t}.
@@ -363,36 +380,58 @@ class RedBlackTree<T extends Comparable<T>> {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
         assert t.size() > 0 : "Violation of: x is in labels(t)";
-
-        //Init Vars
-        BinaryTree<T> left = new BinaryTree<T>();
-        BinaryTree<T> right = new BinaryTree<T>();
-        T item = t.root();
-
-        T root = t.disassemble(left, right);
-        if (!root.equals(x)) {
-            //Follow sorted path down tree until node doesn't exist
-            if (root.compareTo(x) > 0) {
-                item = removeFromTree(left, x);
-            } else if (root.compareTo(x) < 0) {
-                item = removeFromTree(right, x);
-            }
-            t.assemble(root, left, right);
-            
-        } else {
-            //Root node is X
-            //Check condition of children
-            if (left.size() == 0 && right.size() > 0) {
-                t.transferFrom(right);
-            } else if (left.size() > 0 && right.size() == 0) {
-                t.transferFrom(left);
-            } else if (left.size() > 0 && right.size() > 0) {
-                t.assemble(removeMin(right), left, right);
-            }
+        
+        BinaryTree<T> current = t;
+        BinaryTree<T> parent = null;
+        boolean isLeftChild = false;
+        
+        // Search for the node
+        while (current.height() > 0) {
+            T rootData = current.root();
+            BinaryTree<T> left = new BinaryTree<T>();
+            BinaryTree<T> right = new BinaryTree<T>();
+            current.disassemble(left, right);
+        
+            if (rootData.equals(x)) {
+                boolean deletedColor = !current.color; // Save whether the deleted node is black
+    
+                // Three cases
+                if (left.height() == 0 && right.height() > 0) {
+                    current.transferFrom(right);
+                } else if (left.height() > 0 && right.height() == 0) {
+                    current.transferFrom(left);
+                } else if (left.height() > 0 && right.height() > 0) {
+                    T successor = removeMin(right);
+                    current.assemble(successor, left, right);
+                } else {
+                    current.transferFrom(new BinaryTree<T>()); // Delete leaf
+                }
+        
+                // If deleted node was black, rebalance
+                if (deletedColor) {
+                    deleteRedBlackValidity(t);
+                }
+        
+                return rootData;
+            } else {
+                // Reassemble before moving down
+                current.assemble(rootData, left, right);
+    
+                parent = current;
+                if (x.compareTo(rootData) < 0) {
+                    current = left;
+                    isLeftChild = true;
+                } else {
+                    current = right;
+                    isLeftChild = false;
+                }
+                }
         }
-
-        return item;
+        
+        return null;
     }
+        
+    
 
     static <T> void traverseInOrder(BinaryTree<T> t){
         BinaryTree<T> left = new BinaryTree<T>();

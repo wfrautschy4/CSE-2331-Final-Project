@@ -6,7 +6,7 @@ class test {
 
     public static void main(String args[]){
         RedBlackTree<Integer> rbt = new RedBlackTree<Integer>();
-
+        rbt.insert(10);
         //Insert n elements into the tree and print each step
         int n = 10;
         for(int i = 1; i <= n; i++){
@@ -17,7 +17,11 @@ class test {
             rbt.getTree().verifyParentPointers();
             TreePrinter.printTree(rbt.getTree());
             System.out.println("----------------------------------");
+            rbt.delete(10);
+            TreePrinter.printTree(rbt.getTree());
         }
+
+        
 
     }
 }
