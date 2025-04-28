@@ -29,8 +29,8 @@ public static void testDelete(){
     ArrayList<Integer> list = rbt.getList();
     
     //Remove an element
-    System.out.println("Removing: "+ list.get(0));
-    rbt.delete(list.get(0));
+    System.out.println("Removing: "+ list.get(15));
+    rbt.delete(list.get(15));
     TreePrinter.printTree(rbt.getTree());
 
 }

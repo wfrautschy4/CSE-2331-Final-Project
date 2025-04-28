@@ -477,8 +477,10 @@ class RedBlackTree<T extends Comparable<T>> {
             // Found node to delete
             if (t.left == null && t.right != null) {
                 t.transferFrom(t.right);
+                deleteRedBlackValidity(t);
             } else if (t.left != null && t.right == null) {
                 t.transferFrom(t.left);
+                deleteRedBlackValidity(t);
             } else if (t.left != null && t.right != null) {
                 // Node has two children: replace with smallest from right subtree
                 BinaryTree<T> successor = t.right;
@@ -490,12 +492,15 @@ class RedBlackTree<T extends Comparable<T>> {
                 if (t.right != null && t.right.data == null) {
                     t.right = null;
                 }
+                deleteRedBlackValidity(successor);
             } else {
                 // Leaf node
                 t.clear();
             }
         }
-    
+        
+        
+
         return item;
     }
     
