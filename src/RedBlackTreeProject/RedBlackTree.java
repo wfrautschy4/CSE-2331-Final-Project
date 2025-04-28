@@ -120,8 +120,9 @@ class RedBlackTree<T extends Comparable<T>> {
         BinaryTree<T> left = new BinaryTree<T>();
         BinaryTree<T> right = new BinaryTree<T>();
         BinaryTree<T> node = null;
+
         //Recursively Look for X
-        if (t.height() > 0) {
+        if (t.size() > 0) {
             T root = t.disassemble(left, right);
 
             //Find which child to travel down
@@ -269,7 +270,7 @@ class RedBlackTree<T extends Comparable<T>> {
      *      The root of the BinaryTree
      * @return {Yes if the given BinaryTree is a valid red/black tree}
      */
-    public static <T>void insertRedBlackValidity(BinaryTree<T> root){
+    public static <T> void insertRedBlackValidity(BinaryTree<T> root){
         System.out.println("Inserted: "+ root.root());
 
         //If tree is just node, change root color to black and return
