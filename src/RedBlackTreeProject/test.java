@@ -7,7 +7,7 @@ class test {
 
 
     public static void main(String args[]){
-        timeDelete();
+        testDelete();
         
         
     }
@@ -29,11 +29,13 @@ public static void testDelete(){
     ArrayList<Integer> list = rbt.getList();
     
     //Remove an element
-    for(int i = 0; i < rbt.size() * 2; i++){
+    int i = 0;
+    while(rbt.size() != 0){
         System.out.println("Removing: "+ list.get(i));
         rbt.delete(list.get(i));
         TreePrinter.printTree(rbt.getTree());
         System.out.println("------------------------");
+        i++;
     }
 }
 
