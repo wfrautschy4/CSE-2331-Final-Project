@@ -1,5 +1,7 @@
 package RedBlackTreeProject;
 
+import java.util.ArrayList;
+
 class RedBlackTree<T extends Comparable<T>> {
     // ---------------- Static Functions ------------ //
 
@@ -252,7 +254,6 @@ class RedBlackTree<T extends Comparable<T>> {
     public static <T> void insertRedBlackValidity(BinaryTree<T> root){
         //If tree is just node, change root color to black and return
         if(root.color == true && (root.parent == null)){
-            System.out.println("Root Parent = "+ root.parent);
             root.color = false;
             return;
         }
@@ -264,14 +265,12 @@ class RedBlackTree<T extends Comparable<T>> {
         BinaryTree<T> grandparent = root.parent.parent;
         //If inserted and parent color is red then check the color of parent's sibling
         if(uncle != null && uncle.color){
-            System.out.println("Uncle exists: "+ uncle.root()+ " and is "+uncle.color);
             parent.color = false;
             uncle.color = false;
             grandparent.color = true;
             insertRedBlackValidity(grandparent);
 
-        }else{
-            System.out.println("Uncle doesn't exist or is black");
+        } else {
             if(parent.left == root && grandparent.left == parent){
                 parent.color = false;
                 grandparent.color = true; 
@@ -291,10 +290,9 @@ class RedBlackTree<T extends Comparable<T>> {
                 rotateRight(parent);
                 rotateLeft(grandparent);
             }
-
                        
         }
-        }
+    }
     
     /**
      * Checks the given tree to see if it is balanced and abides by the red/black rules when inserting.
@@ -434,14 +432,15 @@ class RedBlackTree<T extends Comparable<T>> {
     
 
     static <T> void traverseInOrder(BinaryTree<T> t){
+    static <T> void traverseInOrder(BinaryTree<T> t, ArrayList<T> list){
         BinaryTree<T> left = new BinaryTree<T>();
         BinaryTree<T> right = new BinaryTree<T>();
 
         if (t.size() > 0){ //Not an empty node
             T root = t.disassemble(left, right);
-            traverseInOrder(left);
-            System.out.print(root+" ");
-            traverseInOrder(right);
+            traverseInOrder(left, list);
+            list.add(root);
+            traverseInOrder(right, list);
         }
     }
 
@@ -471,11 +470,11 @@ class RedBlackTree<T extends Comparable<T>> {
         return isInTree(this.t, data);
     }
 
-    public void traverse(){
+    public ArrayList<T> getList(){
         //Print out data in sorted order
-        System.out.print("[ ");
-        traverseInOrder(this.t);
-        System.out.print("]\n");
+        ArrayList<T> list = new ArrayList<T>();
+        traverseInOrder(this.t, list);
+        return list;
     }
 
     public BinaryTree<T> getTree(){
@@ -486,5 +485,8 @@ class RedBlackTree<T extends Comparable<T>> {
     }
     public int height(){
         return this.t.height();
+    }
+    public void clear(){
+        this.t = new BinaryTree<T>();
     }
 }

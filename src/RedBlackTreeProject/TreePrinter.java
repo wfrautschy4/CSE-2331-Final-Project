@@ -1,5 +1,4 @@
 package RedBlackTreeProject;
-import java.util.*;
 
 public class TreePrinter {
 
