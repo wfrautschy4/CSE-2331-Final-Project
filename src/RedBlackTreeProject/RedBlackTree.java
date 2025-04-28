@@ -110,37 +110,6 @@ class RedBlackTree<T extends Comparable<T>> {
         return inTree;
     }
 
-
-    private static <T extends Comparable<T>> BinaryTree<T> getNode(BinaryTree<T> t,
-            T x) {
-        assert t != null : "Violation of: t is not null";
-        assert x != null : "Violation of: x is not null";
-
-        //Init Vars
-        BinaryTree<T> left = new BinaryTree<T>();
-        BinaryTree<T> right = new BinaryTree<T>();
-        BinaryTree<T> node = null;
-
-        //Recursively Look for X
-        if (t.size() > 0) {
-            T root = t.disassemble(left, right);
-
-            //Find which child to travel down
-            if (root.compareTo(x) > 0) {
-                node = getNode(left, x);
-                t.assemble(root, left, right);
-                
-            } else if (root.compareTo(x) < 0) {
-                node = getNode(right, x);
-                t.assemble(root, left, right);
-            } else {
-                t.assemble(root, left, right);
-                node = t;
-            }
-        }
-
-        return node;
-    }
     /**
      * Removes and returns the smallest (left-most) label in {@code t}.
      *
@@ -340,30 +309,31 @@ class RedBlackTree<T extends Comparable<T>> {
             T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
-        //Init Vars
-        BinaryTree<T> left = new BinaryTree<T>();
-        BinaryTree<T> right = new BinaryTree<T>();
+        BinaryTree<T> current = t;
 
-        //Not leaf node
-        if (t.size() != 0) {
-            T root = t.disassemble(left, right);
-
-            //Follow sorted path down tree until node doesn't exist
-            if (root.compareTo(x) >= 0) {
-                insertInTree(left, x);
-            } else if (root.compareTo(x) < 0) {
-                insertInTree(right, x);
+        while (current.data != null) { // While we're not at an empty spot
+            if (x.compareTo(current.data) <= 0) {
+                if (current.left == null) {
+                    current.left = new BinaryTree<T>();
+                    current.left.parent = current; // maintain parent link
+                }
+                current = current.left;
+            } else {
+                if (current.right == null) {
+                    current.right = new BinaryTree<T>();
+                    current.right.parent = current; // maintain parent link
+                }
+                current = current.right;
             }
-            
-            t.assemble(root, left, right);
-            //Ensure that tree is balanced after inserting
-            //balanceNode(t);
-        } else {
-            t.color = true;
-            t.assemble(x, left, right);
-            // insertRedBlackValidity(t);
-            
-        }
+        }   
+
+        // We've now landed on an empty node
+        current.color = true; // Red for Red-Black insert (you might fix this later)
+        current.data = x;
+        current.left = null;
+        current.right = null;
+
+        insertRedBlackValidity(current);
     }
 
      /**
@@ -448,7 +418,6 @@ class RedBlackTree<T extends Comparable<T>> {
 
     public void insert(T data){
         insertInTree(this.t, data);
-        insertRedBlackValidity(getNode(this.t, data));
     }
 
     public T delete(T data){
