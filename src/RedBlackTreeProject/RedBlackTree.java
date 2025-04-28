@@ -109,6 +109,37 @@ class RedBlackTree<T extends Comparable<T>> {
         }
         return inTree;
     }
+
+
+    private static <T extends Comparable<T>> BinaryTree<T> getNode(BinaryTree<T> t,
+            T x) {
+        assert t != null : "Violation of: t is not null";
+        assert x != null : "Violation of: x is not null";
+
+        //Init Vars
+        BinaryTree<T> left = new BinaryTree<T>();
+        BinaryTree<T> right = new BinaryTree<T>();
+        BinaryTree<T> node = null;
+        //Recursively Look for X
+        if (t.height() > 0) {
+            T root = t.disassemble(left, right);
+
+            //Find which child to travel down
+            if (root.compareTo(x) > 0) {
+                node = getNode(left, x);
+                t.assemble(root, left, right);
+                
+            } else if (root.compareTo(x) < 0) {
+                node = getNode(right, x);
+                t.assemble(root, left, right);
+            } else {
+                t.assemble(root, left, right);
+                node = t;
+            }
+        }
+
+        return node;
+    }
     /**
      * Removes and returns the smallest (left-most) label in {@code t}.
      *
@@ -212,6 +243,18 @@ class RedBlackTree<T extends Comparable<T>> {
 
     }
 
+    public static <T> BinaryTree<T> getUncle(BinaryTree<T> root){
+        BinaryTree<T> uncle = new BinaryTree<T>();//True if uncle is on the right else left
+
+        if(root.parent.parent.left == root.parent){
+            uncle = root.parent.parent.right;
+        }else if(root.parent.parent.right == root.parent){
+            uncle = root.parent.parent.left;
+        }
+
+        return uncle;
+    }
+
     /**
      * Checks the given tree to see if it is balanced and abides by the red/black rules.
      * 
@@ -226,11 +269,57 @@ class RedBlackTree<T extends Comparable<T>> {
      *      The root of the BinaryTree
      * @return {Yes if the given BinaryTree is a valid red/black tree}
      */
-    public static <T> boolean checkValidity(BinaryTree<T> root){
+    public static <T>void insertRedBlackValidity(BinaryTree<T> root){
+        System.out.println("Inserted: "+ root.root());
 
+        //If tree is just node, change root color to black and return
+        if(root.color == true && (root.parent == null)){
+            System.out.println("Root Parent = "+ root.parent);
+            root.color = false;
+            return;
+        }
+        System.out.println("1");
+        if (!root.parent.color) {
+            return; // parent is black, so no violation
+        }
+        System.out.println("2");
+        BinaryTree<T> uncle = getUncle(root);
+        BinaryTree<T> parent = root.parent;
+        BinaryTree<T> grandparent = root.parent.parent;
+        System.out.println("3");
+        //If inserted and parent color is red then check the color of parent's sibling
+        if(uncle != null && uncle.color){
+            System.out.println("Uncle exists: "+ uncle.root()+ " and is "+uncle.color);
+            parent.color = false;
+            uncle.color = false;
+            grandparent.color = true;
+            insertRedBlackValidity(grandparent);
 
-        return false;
-    }
+        }else{
+            System.out.println("Uncle doesn't exist or is black");
+            if(parent.left == root && grandparent.left == parent){
+                rotateRight(grandparent);
+                parent.color = false;
+                grandparent.color = true; 
+            }else if(parent.right == root && grandparent.left == parent) {
+                rotateLeft(parent);
+                rotateRight(grandparent);
+                root.color = false;
+                grandparent.color = true; 
+            }else if(parent.right == root && grandparent.right == parent){
+                rotateLeft(grandparent);
+                parent.color = false;
+                grandparent.color = true; 
+            }else if(parent.left == root && grandparent.right == parent){
+                rotateRight(parent);
+                rotateLeft(grandparent);
+                root.color = false;
+                grandparent.color = true; 
+            }
+
+                       
+        }
+        }
 
      /**
      * Inserts {@code x} in {@code t}.
@@ -250,10 +339,6 @@ class RedBlackTree<T extends Comparable<T>> {
             T x) {
         assert t != null : "Violation of: t is not null";
         assert x != null : "Violation of: x is not null";
-        if(t.root() == null){
-            t.replaceRoot(x);
-            return;
-        }
         //Init Vars
         BinaryTree<T> left = new BinaryTree<T>();
         BinaryTree<T> right = new BinaryTree<T>();
@@ -268,13 +353,15 @@ class RedBlackTree<T extends Comparable<T>> {
             } else if (root.compareTo(x) < 0) {
                 insertInTree(right, x);
             }
-
+            
             t.assemble(root, left, right);
-
             //Ensure that tree is balanced after inserting
-            balanceNode(t);
+            //balanceNode(t);
         } else {
+            t.color = true;
             t.assemble(x, left, right);
+            // insertRedBlackValidity(t);
+            
         }
     }
 
@@ -360,6 +447,7 @@ class RedBlackTree<T extends Comparable<T>> {
 
     public void insert(T data){
         insertInTree(this.t, data);
+        insertRedBlackValidity(getNode(this.t, data));
     }
 
     public T delete(T data){
