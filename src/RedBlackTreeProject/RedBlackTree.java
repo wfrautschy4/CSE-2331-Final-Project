@@ -1,7 +1,5 @@
 package RedBlackTreeProject;
 
-import java.util.ArrayList;
-
 class RedBlackTree<T extends Comparable<T>> {
     // ---------------- Static Functions ------------ //
 
@@ -270,7 +268,7 @@ class RedBlackTree<T extends Comparable<T>> {
             grandparent.color = true;
             insertRedBlackValidity(grandparent);
 
-        } else {
+        }else{
             if(parent.left == root && grandparent.left == parent){
                 parent.color = false;
                 grandparent.color = true; 
@@ -290,9 +288,10 @@ class RedBlackTree<T extends Comparable<T>> {
                 rotateRight(parent);
                 rotateLeft(grandparent);
             }
+
                        
         }
-    }
+        }
     
     /**
      * Checks the given tree to see if it is balanced and abides by the red/black rules when inserting.
@@ -308,8 +307,87 @@ class RedBlackTree<T extends Comparable<T>> {
      *      The root of the BinaryTree
      * @return {Yes if the given BinaryTree is a valid red/black tree}
      */
-    public static <T> void deleteRedBlackValidity(BinaryTree<T> root){
+    public static <T> void deleteRedBlackValidity(BinaryTree<T> root) {
+        if (root == null) return;
+    
+        BinaryTree<T> parent = root.parent;
+        while (root != null && parent != null && !root.color) {
+            if (root == parent.left) {
+                BinaryTree<T> sibling = parent.right;
+    
+                if (sibling == null) {
+                    root = parent;
+                    parent = root.parent;
+                    continue;
+                }
+    
+                if (sibling.color) {
+                    sibling.color = false;
+                    parent.color = true;
+                    rotateLeft(parent);
+                    sibling = parent.right;
+                }
+    
+                if ((sibling.left == null || !sibling.left.color) &&
+                    (sibling.right == null || !sibling.right.color)) {
+                    sibling.color = true;
+                    root = parent;
+                    parent = root.parent;
+                } else {
+                    if (sibling.right == null || !sibling.right.color) {
+                        if (sibling.left != null) sibling.left.color = false;
+                        sibling.color = true;
+                        rotateRight(sibling);
+                        sibling = parent.right;
+                    }
+                    sibling.color = parent.color;
+                    parent.color = false;
+                    if (sibling.right != null) sibling.right.color = false;
+                    rotateLeft(parent);
+                    root = null; // Done
+                }
+            } else { // Symmetric
+                BinaryTree<T> sibling = parent.left;
+    
+                if (sibling == null) {
+                    root = parent;
+                    parent = root.parent;
+                    continue;
+                }
+    
+                if (sibling.color) {
+                    sibling.color = false;
+                    parent.color = true;
+                    rotateRight(parent);
+                    sibling = parent.left;
+                }
+    
+                if ((sibling.left == null || !sibling.left.color) &&
+                    (sibling.right == null || !sibling.right.color)) {
+                    sibling.color = true;
+                    root = parent;
+                    parent = root.parent;
+                } else {
+                    if (sibling.left == null || !sibling.left.color) {
+                        if (sibling.right != null) sibling.right.color = false;
+                        sibling.color = true;
+                        rotateLeft(sibling);
+                        sibling = parent.left;
+                    }
+                    sibling.color = parent.color;
+                    parent.color = false;
+                    if (sibling.left != null) sibling.left.color = false;
+                    rotateRight(parent);
+                    root = null; // Done
+                }
+            }
+        }
+    
+        if (root != null) {
+            root.color = false; // Ensure root is black
+        }
     }
+    
 
      /**
      * Inserts {@code x} in {@code t}.
@@ -331,7 +409,7 @@ class RedBlackTree<T extends Comparable<T>> {
         assert x != null : "Violation of: x is not null";
         BinaryTree<T> current = t;
 
-        while (current.data != null) { // While we're not at an empty spot
+        while (current.data != null) { 
             if (x.compareTo(current.data) <= 0) {
                 if (current.left == null) {
                     current.left = new BinaryTree<T>();
@@ -346,9 +424,7 @@ class RedBlackTree<T extends Comparable<T>> {
                 current = current.right;
             }
         }   
-
-        // We've now landed on an empty node
-        current.color = true; // Red for Red-Black insert (you might fix this later)
+        current.color = true;
         current.data = x;
         current.left = null;
         current.right = null;
@@ -374,73 +450,65 @@ class RedBlackTree<T extends Comparable<T>> {
      *  labels(t) = labels(#t) \ {x}
      * </pre>
      */
-    public static <T extends Comparable<T>> T removeFromTree(BinaryTree<T> t, T x) {
-        assert t != null : "Violation of: t is not null";
-        assert x != null : "Violation of: x is not null";
-        assert t.size() > 0 : "Violation of: x is in labels(t)";
-        
+    public static <T extends Comparable<T>> void removeFromTree(BinaryTree<T> t, T x) {
         BinaryTree<T> current = t;
-        BinaryTree<T> parent = null;
-        boolean isLeftChild = false;
         
-        // Search for the node
-        while (current.height() > 0) {
-            T rootData = current.root();
-            BinaryTree<T> left = new BinaryTree<T>();
-            BinaryTree<T> right = new BinaryTree<T>();
-            current.disassemble(left, right);
-        
+        while (current != null && current.height() > 0) {
+            T rootData = current.data;
+            BinaryTree<T> left = current.left();
+            BinaryTree<T> right = current.right();
+            System.out.println("3");
             if (rootData.equals(x)) {
-                boolean deletedColor = !current.color; // Save whether the deleted node is black
-    
-                // Three cases
-                if (left.height() == 0 && right.height() > 0) {
+                System.out.println("4");
+                if ((left == null || left.height() == 0) && (right == null || right.height() == 0)) {
+                    System.out.println("Case 1");
+                    if (!current.color) deleteRedBlackValidity(current);
+                    current = null;
+                    return;
+                } else if (left == null || left.height() == 0) {
+                    if (right != null) right.parent = current.parent;
                     current.transferFrom(right);
-                } else if (left.height() > 0 && right.height() == 0) {
+                    return;
+                } else if (right == null || right.height() == 0) {
+                    if (left != null) left.parent = current.parent;
                     current.transferFrom(left);
-                } else if (left.height() > 0 && right.height() > 0) {
-                    T successor = removeMin(right);
-                    current.assemble(successor, left, right);
+                    return;
                 } else {
-                    current.transferFrom(new BinaryTree<T>()); // Delete leaf
-                }
-        
-                // If deleted node was black, rebalance
-                if (deletedColor) {
-                    deleteRedBlackValidity(t);
-                }
-        
-                return rootData;
-            } else {
-                // Reassemble before moving down
-                current.assemble(rootData, left, right);
+                    // Find successor
+                    BinaryTree<T> successor = right;
+                    while (successor.left() != null && successor.left().height() > 0)
+                        successor = successor.left();
+                    
+                    boolean succWasBlack = !successor.color;
+                    current.data = successor.data;
     
-                parent = current;
-                if (x.compareTo(rootData) < 0) {
-                    current = left;
-                    isLeftChild = true;
-                } else {
-                    current = right;
-                    isLeftChild = false;
+                    removeFromTree(right, successor.data); // delete successor in right subtree
+    
+                    if (succWasBlack) deleteRedBlackValidity(successor);
+                    return;
                 }
-                }
+            } else if (x.compareTo(current.root()) < 0) {
+                current = current.left();
+            } else {
+                current = current.right();
+            }
+            
         }
-        
-        return null;
     }
+    
+    
         
     
 
     static <T> void traverseInOrder(BinaryTree<T> t){
-    static <T> void traverseInOrder(BinaryTree<T> t, ArrayList<T> list){
         BinaryTree<T> left = new BinaryTree<T>();
         BinaryTree<T> right = new BinaryTree<T>();
 
         if (t.size() > 0){ //Not an empty node
             T root = t.disassemble(left, right);
-            traverseInOrder(left, list);
-            list.add(root);
-            traverseInOrder(right, list);
+            traverseInOrder(left);
+            System.out.print(root+" ");
+            traverseInOrder(right);
         }
     }
 
@@ -462,19 +530,19 @@ class RedBlackTree<T extends Comparable<T>> {
         insertInTree(this.t, data);
     }
 
-    public T delete(T data){
-        return removeFromTree(this.t, data);
+    public void delete(T data){
+         removeFromTree(this.t, data);
     }
 
     public boolean contains(T data){
         return isInTree(this.t, data);
     }
 
-    public ArrayList<T> getList(){
+    public void traverse(){
         //Print out data in sorted order
-        ArrayList<T> list = new ArrayList<T>();
-        traverseInOrder(this.t, list);
-        return list;
+        System.out.print("[ ");
+        traverseInOrder(this.t);
+        System.out.print("]\n");
     }
 
     public BinaryTree<T> getTree(){
@@ -485,8 +553,5 @@ class RedBlackTree<T extends Comparable<T>> {
     }
     public int height(){
         return this.t.height();
-    }
-    public void clear(){
-        this.t = new BinaryTree<T>();
     }
 }
